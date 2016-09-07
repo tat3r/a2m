@@ -26,7 +26,18 @@ based client.
 
 Don't use reverse video, just make foreground white on black background, but
 not bright white, there should be two different whites, bright white and
-grayish white, 16 unique colors in all.
+grayish white, 16 unique colors in all, as shown below:
+
+Color | Regular | Bold
+------|---------|-----
+Black   | #000000 (0, 0, 0)       | #555555 (85, 85, 85)
+Red     | #aa0000 (170, 0, 0)     | #ff5555 (255, 85, 85)
+Green   | #00aa00 (0, 170, 0)     | #55ff55 (85, 255, 85)
+Yellow  | #aaaa00 (170, 170, 0)   | #ffff55 (255, 255, 85)
+Blue    | #0000aa (0, 0, 170)     | #5555ff (85, 85, 255)
+Magenta | #aa00aa (170, 0, 170)   | #ff55ff (255, 85, 255)
+Cyan    | #00aaaa (0, 170, 170 )  | #55ffff (85, 255, 255)
+White   | #aaaaaa (170, 170, 170) | #ffffff (255, 255, 255)
 
 ### Font
 
