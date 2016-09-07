@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
 	argc -= optind;
 	argv += optind;
 
-	// init the first line
+	/* init the first line */
 	inc_row();	
 	
 	if (argc == 1) {
