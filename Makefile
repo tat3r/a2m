@@ -1,0 +1,18 @@
+PROG := a2m
+SRC := a2m.c
+CC := cc
+CFLAGS += -g -Wall
+
+UNAME := $(shell sh -c 'UNAME -s 2>/dev/null')
+
+ifeq ($(UNAME),Darwin)
+	CC := clang
+	CFLAGS += -Wunused-result -Wunused-value
+	LDFLAGS += -liconv
+endif
+
+default:
+	$(CC) $(CFLAGS) $(LDFLAGS) $(SRC) -o $(PROG)
+
+clean:
+	rm -rf $(PROG) $(PROG).dSYM
