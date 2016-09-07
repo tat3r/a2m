@@ -2,6 +2,8 @@
 
 Convert ansi art to mirc art.
 
+![screenshot](https://github.com/tat3r/a2m/blob/master/screenshot.png?raw=true)
+
 ## Installation
 
 run make and copy a2m wherever you want.
