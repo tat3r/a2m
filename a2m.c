@@ -444,7 +444,7 @@ int main(int argc, char *argv[]) {
 }
 
 void usage(void) {
-	fprintf(stderr, "Usage: a2m [options] input.ans\n");
+	fprintf(stderr, "Usage: a2m [options] [input.ans]\n");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "Options:");
 	fprintf(stderr, "\n");		
