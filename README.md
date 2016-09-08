@@ -4,6 +4,9 @@ Convert ansi art to mirc art.
 
 ![screenshot](https://github.com/tat3r/a2m/blob/master/screenshot.png?raw=true)
 
+For reference screenshot is iTerm2 with Andale Mono font ssh'd to a linux
+machine attached to a tmux session running irssi.
+
 ## Installation
 
 run make and copy a2m wherever you want.
@@ -17,10 +20,10 @@ run a2m -h for a list of options
 ### IRC Client
 
 IRCCloud doesn't work very well.  It's monospaced font is *Iconsolata*, served
-up by Google Web Fonts, which doesn't draw the block characters correctly.  In
-addition it appears to ignore several lines when flooding fast.  Don't use
-IRCCloud, it's for people who habitually make bad decisions in life.  Works
-best with a terminal based client.
+up by Google Web Fonts, which doesn't draw the block characters correctly
+(see below).  In addition it appears to ignore several lines when flooding
+fast.  Don't use IRCCloud, it's for people who habitually make bad decisions
+in life.  Works best with a terminal based client.
 
 ### Terminal
 
