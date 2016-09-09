@@ -21,7 +21,7 @@ run a2m -h for a list of options
 
 IRCCloud doesn't work very well.  It's monospaced font is *Iconsolata*, served
 up by Google Web Fonts, which doesn't draw the block characters correctly
-(see below).
+(see below).  Mirc has broken unicode support.
 
 ### Terminal
 
