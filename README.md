@@ -21,9 +21,7 @@ run a2m -h for a list of options
 
 IRCCloud doesn't work very well.  It's monospaced font is *Iconsolata*, served
 up by Google Web Fonts, which doesn't draw the block characters correctly
-(see below).  In addition it appears to ignore several lines when flooding
-fast.  Don't use IRCCloud, it's for people who habitually make bad decisions
-in life.  Works best with a terminal based client.
+(see below).
 
 ### Terminal
 
