@@ -4,7 +4,7 @@ Convert ansi art to mirc art.
 
 ![screenshot](https://github.com/tat3r/a2m/blob/master/screenshot.png?raw=true)
 
-For reference screenshot is iTerm2 with Andale Mono font ssh'd to a linux
+For reference screenshot is iTerm2 with Menlo font ssh'd to a linux
 machine attached to a tmux session running irssi.
 
 ## Installation
@@ -42,7 +42,9 @@ White   | #aaaaaa (170, 170, 170) | #ffffff (255, 255, 255)
 
 ### Font
 
-The font you use needs to be monospaced obviously but if its missing some of
-the block drawing unicode characters its going to borrow them from another
-font, which will probably having a different width, resulting in poor alignment
-and jagged edges.  *Andale Mono* is the best I've found so far.
+Try *Andale Mono* or *Menlo* for Mac.  *Deja Vu Sans* for Linux.
+Someone tell me what works good for Windows.
+
+If the font you use is missing some of the block drawing unicode
+characters its going to borrow them from another font, which
+will probably having a different width than the original font.
