@@ -42,8 +42,8 @@ White   | #aaaaaa (170, 170, 170) | #ffffff (255, 255, 255)
 
 ### Font
 
-Try *Andale Mono* or *Menlo* for Mac.  *Deja Vu Sans* for Linux.
-Someone tell me what works good for Windows.
+Try *Andale Mono* or *Menlo* for Mac.  *Deja Vu Sans* for Linux,
+*Lucida Console* Windows.
 
 If the font you use is missing some of the block drawing unicode
 characters its going to borrow them from another font, which
