@@ -1,7 +1,7 @@
 PROG := a2m
 SRC := a2m.c
 CC := cc
-CFLAGS += -g -Wall
+CFLAGS += -g -std=c99 -Wall
 
 UNAME := $(shell sh -c 'UNAME -s 2>/dev/null')
 
