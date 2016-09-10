@@ -10,7 +10,7 @@
 
 #define DEFAULT_FG		7
 #define DEFAULT_BG		0
-#define DEFAULT_BOLD	false
+#define DEFAULT_BOLD		false
 #define DEFAULT_ICE		false
 
 /* technically theres no limit in the format */
