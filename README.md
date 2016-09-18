@@ -19,7 +19,7 @@ run a2m -h for a list of options
 
 ### IRC Client
 
-Most clients work fine assuming you're using a good font (see below.)  Mirc has problems rendering Unicode with colors.
+Most clients work fine assuming you're using a good font (see below.)  Mirc has problems with color sequences following 3 byte Unicode characters, IRCCloud has incorrect colors.
 
 ### Terminal
 
@@ -27,7 +27,7 @@ Don't use reverse video, just make foreground white on black background, but
 not bright white, there should be two different whites, bright white and
 grayish white, 16 unique colors in all, as shown below:
 
-Color | Regular | Bold
+Color | Regular | Bright
 ------|---------|-----
 Black   | #000000 (0, 0, 0)       | #555555 (85, 85, 85)
 Red     | #aa0000 (170, 0, 0)     | #ff5555 (255, 85, 85)
@@ -41,7 +41,7 @@ White   | #aaaaaa (170, 170, 170) | #ffffff (255, 255, 255)
 ### Font
 
 Try *Andale Mono* or *Menlo* for Mac.  *Deja Vu Sans* for Linux,
-*Lucida Console* Windows.
+*Lucida Console* for Windows.
 
 If the font you use is missing some of the block drawing unicode
 characters its going to borrow them from another font, which
