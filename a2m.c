@@ -305,12 +305,7 @@ int main(int argc, char *argv[]) {
 					}
 
 					while (rc > 0) {
-
-						if (row == bottomrow) {
-							break;
-						}
-
-						row++;
+						inc_row();
 						rc--;
 					}
 
