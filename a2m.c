@@ -10,8 +10,14 @@
 #include <unistd.h>
 #include <getopt.h>
 
+#ifndef DEBUG
+#define DEBUG 0
+#else
+#define DEBUG 1
+#endif /* DEBUG */
+
 #define DPRINTF(fmt, ...) if (DEBUG) do {				       \
-	fprintf(stderr, fmt, __VA_ARGS__);				       \
+	fprintf(stderr, fmt, ##__VA_ARGS__);				       \
 } while (0)
 
 #define DEFAULT_FG	7
@@ -189,8 +195,7 @@ int main(int argc, char *argv[]) {
 
 			/* no rational way to recover tbqh imho */
 			if ((ch = fgetc(fd)) != '[') {
-				fprintf(stderr, "Invalid escape code, aborting at line %d\n",
-					c->row + 1);
+				DPRINTF("Invalid escape code, aborting at line %d\n", c->row + 1);
 				exit(EX_DATAERR);
 			}
 
@@ -253,9 +258,7 @@ int main(int argc, char *argv[]) {
 						else if (param[i] == 49)
 							c->bg = DEFAULT_BG;
 						else
-							fprintf(stderr,
-								"Ignored SGR parameter %d at line %d\n",
-								param[i], c->row + 1);
+							DPRINTF("Ignored SGR parameter %d at line %d\n", param[i], c->row + 1);
 					}
 					rc = 0;
 					pcnt = 0;
@@ -401,14 +404,12 @@ int main(int argc, char *argv[]) {
 
 				/* sequences we dont care and/or know about */
 				} else {
-					fprintf(stderr, "Ignored escape code [");
+					DPRINTF("Ignored escape code [");
 
 					for (int i = 0; i < pcnt; i++)
-						fprintf(stderr, "%d%s", param[pcnt],
-							i + 1 < pcnt ? ";" : "");
+						DPRINTF("%d%s", param[pcnt], i + 1 < pcnt ? ";" : "");
 
-					fprintf(stderr, "0x%02x at line %d col %d\n", ch,
-						c->row + 1, c->col + 1);
+					DPRINTF("0x%02x at line %d col %d\n", ch, c->row + 1, c->col + 1);
 
 					rc = 0;
 					pcnt = 0;
@@ -445,8 +446,6 @@ void
 usage(void)
 {
 	fprintf(stderr, "usage: a2m [options] [input.ans]\n");
-	fprintf(stderr, "\n");
-	fprintf(stderr, "options:");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "    -l n      Crop n lines from the left side.\n");
 	fprintf(stderr, "    -r n      Crop n lines from the right side.\n");
