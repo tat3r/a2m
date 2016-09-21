@@ -6,74 +6,75 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sysexits.h>
 #include <unistd.h>
 #include <getopt.h>
 
-#define DEFAULT_FG		7
-#define DEFAULT_BG		0
-#define DEFAULT_BOLD		false
-#define DEFAULT_ICE		false
+#define DPRINTF(fmt, ...) if (DEBUG) do {				       \
+	fprintf(stderr, fmt, __VA_ARGS__);				       \
+} while (0)
 
-/* technically theres no limit in the format */
-#define MAX_PARAMS	8
+#define DEFAULT_FG	7
+#define DEFAULT_BG	0
+#define DEFAULT_BOLD	false
+#define DEFAULT_ICE	false
+#define MAX_PARAMS	16
 
 /* 4 bytes + '\0' */
 #define MAX_UTFSTR	5
 
 typedef struct cell_s {
-	char *utfchar;
-	int fg;
-	int bg;
-	bool bold;
-	bool ice;
+	char	*utfchar;
+	int	fg;
+	int	bg;
+	bool	bold;
+	bool	ice;
 } cell_t;
 
 typedef struct canvas_s {
-	/* canvas state */
-	cell_t **cell;
-	char fg;
-	char bg;
-	bool bold;
-	bool ice;
-
-	/* cursor state */
-	int row;
-	int col;
-	int bottomrow;
-	int oldrow;
-	int oldcol;
-
-	/* options */
-	int max_cols;
-	bool use_color;
-	bool show_unp;
-	int tab_size;
-	int lcrop;
-	int rcrop;
-	int default_fg;
-	int default_bg;
+	cell_t	**cell;		/* canvas state */
+	char	fg;
+	char	bg;
+	bool	bold;
+	bool	ice;
+	int	row;		/* cursor state */
+	int	col;
+	int	bottomrow;
+	int	oldrow;
+	int	oldcol;
+	int	max_cols;	/* options */
+	bool	use_color;
+	bool	show_unp;
+	int	tab_size;
+	int	lcrop;
+	int	rcrop;
+	int	default_fg;
+	int	default_bg;
 } canvas_t;
 
-int get_fgcolor(cell_t *cell);
-int get_bgcolor(cell_t *cell);
-void print_color(canvas_t *c, cell_t *cell, int col);
-void inc_row(canvas_t *c);
-void draw_cell(canvas_t *c, char *inchar, int fg, int bg, bool bold, bool ice);
-void usage(void);
+int	get_fgcolor(cell_t *cell);
+int	get_bgcolor(cell_t *cell);
+void	print_color(canvas_t *c, cell_t *cell, int col);
+void	inc_row(canvas_t *c);
+void	draw_cell(canvas_t *c, char *inch, int fg, int bg, bool bold, bool ice);
+void	usage(void);
 
 /* lol globals */
 
-/* ANSI COLORS               BLK RED GRN YEL BLU MAG CYN WHT */
-/*                            0   1   2   3   4   5   6   7  */
-/* MIRC COLORS               ------------------------------- */
+/*
+ * ANSI COLORS               BLK RED GRN YEL BLU MAG CYN WHT
+ *                            0   1   2   3   4   5   6   7
+ */
 const char color[8] = {       1,  5,  3,  7,  2,  6, 10, 15 };
 const char color_bold[8] = { 14,  4,  9,  8, 12, 13, 11,  0 };
 
 int main(int argc, char *argv[]) {
 	int opt;
-	FILE *fh;
+	FILE *fd;
 
-	canvas_t *c = (canvas_t *)calloc(1, sizeof(canvas_t));
+	canvas_t *c;
+
+	c = (canvas_t *)calloc(1, sizeof(canvas_t));
 
 	c->fg = DEFAULT_FG;
 	c->bg = DEFAULT_BG;
@@ -97,60 +98,58 @@ int main(int argc, char *argv[]) {
 
 	while((opt = getopt(argc, argv, "npl:r:w:t:")) != -1) {
 		switch(opt) {
-			case 'n':
-				c->use_color = false;
-				break;
-			case 'p':
-				c->show_unp = true;
-				break;
-			case 'l':
-				c->lcrop = atoi(optarg);
-				break;
-			case 'r':
-				c->rcrop = atoi(optarg);
-				break;
-			case 'w':
-				c->max_cols = atoi(optarg);
-				break;
-			case 't':
-				c->tab_size = atoi(optarg);
-				break;
-			case '?':
-				/* fallthrough */
-			case 'h':
-				/* fallthrough */
-			default:
-				usage();
-				return (EXIT_FAILURE);
+		case 'n':
+			c->use_color = false;
+			break;
+		case 'p':
+			c->show_unp = true;
+			break;
+		case 'l':
+			c->lcrop = atoi(optarg);
+			break;
+		case 'r':
+			c->rcrop = atoi(optarg);
+			break;
+		case 'w':
+			c->max_cols = atoi(optarg);
+			break;
+		case 't':
+			c->tab_size = atoi(optarg);
+			break;
+		case '?':
+			/* fallthrough */
+		case 'h':
+			/* fallthrough */
+		default:
+			usage();
 		}
 	}
-
 	argc -= optind;
 	argv += optind;
 
 	/* init the first line */
 	inc_row(c);
 
-	if (argc == 1) {
-		fh = fopen(argv[0], "r");
+	fd = NULL;
 
-	} else if (argc == 0) {
-		fh = stdin;
-
-	} else {
+	if (argc == 1)
+		fd = fopen(argv[0], "r");
+	else if (argc == 0)
+		fd = stdin;
+	else {
 		usage();
-		exit(EXIT_FAILURE);
 	}
 
-	if (!fh) {
+	if (!fd) {
 		perror(NULL);
-		exit(EXIT_FAILURE);
+		exit(EX_NOINPUT);
 	}
 
 	char *charp = malloc(1);
+
 	if (!charp) {
 		perror(NULL);
-		exit(EXIT_FAILURE);
+		exit(EX_OSERR);
 	}
 
 	char *space = " ";
@@ -160,35 +159,28 @@ int main(int argc, char *argv[]) {
 	int param[MAX_PARAMS];
 	uint32_t ch = 0;
 
-	while ((ch = fgetc(fh)) != EOF) {
+	while ((ch = fgetc(fd)) != EOF) {
 
 		/* ignore sauce record */
-		if (ch == 0x1A) {
+		if (ch == 0x1a)
 			break;
-		}
 
 		/* drawable character */
-		if (ch != 0x1B) {
+		if (ch != 0x1b) {
 			*charp = (char)ch;
 
 			/* convert tabs to spaces */
-			if (ch == '\t') {
-				for (int i = 0; i < c->tab_size; i++) {
+			if (ch == '\t')
+				for (int i = 0; i < c->tab_size; i++)
 					draw_cell(c, space, c->fg, c->bg, c->bold, c->ice);
-				}
-
-			} else if (ch == '\0') {
+			else if (ch == '\0')
 				draw_cell(c, space, DEFAULT_FG, DEFAULT_BG, c->bold, c->ice);
-
-			} else if (ch != '\r' && ch != '\n') {
+			else if (ch != '\r' && ch != '\n')
 				draw_cell(c, charp, c->fg, c->bg, c->bold, c->ice);
-			}
 
-			if (ch == '\n') {
-				while (c->col != 0) {
+			if (ch == '\n')
+				while (c->col != 0)
 					draw_cell(c, space, c->fg, c->bg, c->bold, c->ice);
-				}
-			}
 
 		/* escape code */
 		} else {
@@ -196,13 +188,13 @@ int main(int argc, char *argv[]) {
 			pcnt = 0;
 
 			/* no rational way to recover tbqh imho */
-			if ((ch = fgetc(fh)) != '[') {
+			if ((ch = fgetc(fd)) != '[') {
 				fprintf(stderr, "Invalid escape code, aborting at line %d\n",
 					c->row + 1);
-				exit(EXIT_FAILURE);
+				exit(EX_DATAERR);
 			}
 
-			while ((ch = fgetc(fh)) != EOF) {
+			while ((ch = fgetc(fd)) != EOF) {
 
 				/* parameters */
 				if (isdigit(ch)) {
@@ -211,7 +203,7 @@ int main(int argc, char *argv[]) {
 
 				/* oddball parameter prefixes */
 				} else if (ch == '?' || ch == '=' || ch == '>') {
-					/* just eat them */
+					/* just eat them for now */
 
 				/* end of parameter, havent encountered ':' but its legit */
 				} else if (ch == ';' || ch == ':') {
@@ -221,11 +213,9 @@ int main(int argc, char *argv[]) {
 
 				/* spacing */
 				} else if (ch == 'C') {
-
 					/* default to one space */
-					if (rc == 0) {
+					if (rc == 0)
 						rc = 1;
-					}
 					for (int i = 0; i < rc; i++) {
 						draw_cell(c, space, DEFAULT_FG, DEFAULT_BG,
 							DEFAULT_BOLD, DEFAULT_ICE);
@@ -240,35 +230,32 @@ int main(int argc, char *argv[]) {
 					param[pcnt] = rc;
 					pcnt++;
 					for (int i = 0; i < pcnt; i++) {
-
 						/* reset */
 						if (param[i] == 0) {
 							c->bold = false;
 							c->ice = false;
 							c->fg = DEFAULT_FG;
 							c->bg = DEFAULT_BG;
-
-						} else if (param[i] == 1) {
+						} else if (param[i] == 1)
 							c->bold = true;
-						} else if (param[i] == 5) {
+						else if (param[i] == 5)
 							c->ice = true;
-						} else if (param[i] == 21 || param[i] == 22) {
+						else if (param[i] == 21 || param[i] == 22)
 							c->bold = false;
-						} else if (param[i] == 25) {
+						else if (param[i] == 25)
 							c->ice = false;
-						} else if (param[i] >= 30 && param[i] <= 37) {
+						else if (param[i] >= 30 && param[i] <= 37)
 							c->fg = param[i] - 30;
-						} else if (param[i] >= 40 && param[i] <= 47) {
+						else if (param[i] >= 40 && param[i] <= 47)
 							c->bg = param[i] - 40;
-						} else if (param[i] == 39) {
+						else if (param[i] == 39)
 							c->fg = DEFAULT_FG;
-						} else if (param[i] == 49) {
+						else if (param[i] == 49)
 							c->bg = DEFAULT_BG;
-						} else {
+						else
 							fprintf(stderr,
 								"Ignored SGR parameter %d at line %d\n",
 								param[i], c->row + 1);
-						}
 					}
 					rc = 0;
 					pcnt = 0;
@@ -287,9 +274,8 @@ int main(int argc, char *argv[]) {
 							c->cell[i][j].bold = DEFAULT_BOLD;
 							c->cell[i][j].ice = DEFAULT_ICE;
 
-							if (c->cell[i][j].utfchar) {
+							if (c->cell[i][j].utfchar)
 								free(c->cell[i][j].utfchar);
-							}
 						}
 					}
 					rc = 0;
@@ -300,18 +286,16 @@ int main(int argc, char *argv[]) {
 				} else if (ch == 'A') {
 
 					/* default is 1 */
-					if (rc == 0) {
+					if (rc == 0)
 						rc = 1;
-					}
 
 					while (rc > 0) {
 
 						/* found an ansi that tried this */
 						/* probably from a bbs prelogin that assumed */
 						/* frontdoor was eating the first few lines */
-						if (c->row == 0) {
+						if (c->row == 0)
 							break;
-						}
 
 						c->row--;
 						rc--;
@@ -324,9 +308,8 @@ int main(int argc, char *argv[]) {
 				/* move down */
 				} else if (ch == 'B') {
 
-					if (rc == 0) {
+					if (rc == 0)
 						rc = 1;
-					}
 
 					while (rc > 0) {
 						inc_row(c);
@@ -340,15 +323,13 @@ int main(int argc, char *argv[]) {
 				/* move forward */
 				} else if (ch == 'C') {
 
-					if (rc == 0) {
+					if (rc == 0)
 						rc = 1;
-					}
 
 					while (rc > 0) {
 
-						if (c->col == c->max_cols - 1) {
+						if (c->col == c->max_cols - 1)
 							break;
-						}
 
 						c->col++;
 						rc--;
@@ -361,15 +342,12 @@ int main(int argc, char *argv[]) {
 				/* move back */
 				} else if (ch == 'D') {
 
-					if (rc == 0) {
+					if (rc == 0)
 						rc = 1;
-					}
 
 					while (rc > 0) {
-
-						if (c->col == 0) {
+						if (c->col == 0)
 							break;
-						}
 
 						c->col--;
 						rc--;
@@ -424,10 +402,11 @@ int main(int argc, char *argv[]) {
 				/* sequences we dont care and/or know about */
 				} else {
 					fprintf(stderr, "Ignored escape code [");
-					for (int i = 0; i < pcnt; ++i) {
+
+					for (int i = 0; i < pcnt; i++)
 						fprintf(stderr, "%d%s", param[pcnt],
 							i + 1 < pcnt ? ";" : "");
-					}
+
 					fprintf(stderr, "0x%02x at line %d col %d\n", ch,
 						c->row + 1, c->col + 1);
 
@@ -445,29 +424,29 @@ int main(int argc, char *argv[]) {
 
 			if (!cell->utfchar) {
 				printf("\n");
-				return 0;
+				return (0);
 			}
 
-			if (c->use_color) {
+			if (c->use_color)
 				print_color(c, cell, j);
-			}
 
 			printf("%s", cell->utfchar);
 		}
 		printf("\n");
 	}
 
-	if (argc == 1) {
-		fclose(fh);
-	}
+	if (argc == 1)
+		fclose(fd);
 
-	return 0;
+	return (0);
 }
 
-void usage(void) {
-	fprintf(stderr, "Usage: a2m [options] [input.ans]\n");
+void
+usage(void)
+{
+	fprintf(stderr, "usage: a2m [options] [input.ans]\n");
 	fprintf(stderr, "\n");
-	fprintf(stderr, "Options:");
+	fprintf(stderr, "options:");
 	fprintf(stderr, "\n");
 	fprintf(stderr, "    -l n      Crop n lines from the left side.\n");
 	fprintf(stderr, "    -r n      Crop n lines from the right side.\n");
@@ -475,18 +454,24 @@ void usage(void) {
 	fprintf(stderr, "    -p        Print unprintable characters.\n");
 	fprintf(stderr, "    -t size   Specify tab size, default is 8.\n");
 	fprintf(stderr, "    -w width  Specify width, default is 80.\n");
-	return;
+	exit(EX_USAGE);
 }
 
-int get_fgcolor(cell_t *cell) {
-	return cell->bold ? color_bold[cell->fg] : color[cell->fg];
+int
+get_fgcolor(cell_t *cell)
+{
+	return (cell->bold ? color_bold[cell->fg] : color[cell->fg]);
 }
 
-int get_bgcolor(cell_t *cell) {
-	return cell->ice ? color_bold[cell->bg] : color[cell->bg];
+int
+get_bgcolor(cell_t *cell)
+{
+	return (cell->ice ? color_bold[cell->bg] : color[cell->bg]);
 }
 
-void print_color(canvas_t *c, cell_t *cell, int col) {
+void
+print_color(canvas_t *c, cell_t *cell, int col)
+{
 	static cell_t *prev = NULL;
 
 	int oldfg = (!prev || col == 0 + c->lcrop) ? DEFAULT_FG : prev->fg;
@@ -494,45 +479,42 @@ void print_color(canvas_t *c, cell_t *cell, int col) {
 	int oldbold = (!prev || col == 0 + c->lcrop) ? DEFAULT_BOLD : prev->bold;
 	int oldice = (!prev || col == 0 + c->lcrop) ? DEFAULT_ICE : prev->ice;
 
-	if (cell->fg != oldfg ||
-		cell->bg != oldbg ||
-		cell->bold != oldbold ||
-		cell->ice != oldice) {
+	if (cell->fg != oldfg || cell->bg != oldbg || cell->bold != oldbold || cell->ice != oldice) {
 
 		printf("\x03");
 
-		if (cell->fg != oldfg || cell->bold != oldbold) {
+		if (cell->fg != oldfg || cell->bold != oldbold)
 			printf("%d", get_fgcolor(cell));
-		}
 
-		if (cell->bg != oldbg || (cell->ice != oldice)) {
+		if (cell->bg != oldbg || (cell->ice != oldice))
 			printf(",%d", get_bgcolor(cell));
-		}
 	}
 
 	prev = cell;
 	return;
 }
 
-void inc_row(canvas_t *c) {
+void
+inc_row(canvas_t *c)
+{
+	cell_t **newrows;
+
 	c->row++;
 
-	if (c->row <= c->bottomrow) {
+	if (c->row <= c->bottomrow)
 		return;
-	}
 
 	c->bottomrow = c->row;
 
-	cell_t **newrows = (cell_t **)calloc(c->row + 1, sizeof(cell_t *));
+	newrows = (cell_t **)calloc(c->row + 1, sizeof(cell_t *));
 
 	if (!newrows) {
 		perror(NULL);
-		exit(EXIT_FAILURE);
+		exit(EX_OSERR);
 	}
 
-	for (int i = 0; i < c->row; i++) {
+	for (int i = 0; i < c->row; i++)
 		newrows[i] = c->cell[i];
-	}
 
 	newrows[c->row] = (cell_t *)calloc(c->max_cols, sizeof(cell_t));
 
@@ -545,40 +527,45 @@ void inc_row(canvas_t *c) {
 		c->cell[c->row][j].bold = DEFAULT_BOLD;
 		c->cell[c->row][j].ice = DEFAULT_ICE;
 	}
+	return;
 }
 
-void draw_cell(canvas_t *c, char *inchar, int fg, int bg, bool bold, bool ice) {
+void
+draw_cell(canvas_t *c, char *inch, int fg, int bg, bool bold, bool ice)
+{
 	static iconv_t conv = (iconv_t)0;
+	char *outchp;
+	char *oldoutchp;
 
-	char *outcharp = calloc(1, MAX_UTFSTR);
-	if (!outcharp) {
+	outchp = calloc(1, MAX_UTFSTR);
+
+	if (!outchp) {
 		perror(NULL);
-		exit(EXIT_FAILURE);
-	}
-	char *oldoutcharp = outcharp;
-
-	if ((unsigned char)inchar[0] < 32 && !c->show_unp) {
-				inchar[0] = ' ';
+		exit(EX_OSERR);
 	}
 
-	size_t incharsize = 1;
-	size_t outcharsize = MAX_UTFSTR;
+ 	oldoutchp = outchp;
 
-	if (!conv) {
+	if ((unsigned char)inch[0] < 32 && !c->show_unp)
+		inch[0] = ' ';
+
+	size_t inchsize = 1;
+	size_t outchsize = MAX_UTFSTR;
+
+	if (!conv)
 		conv = iconv_open("UTF-8", "CP437");
-	}
 
-	iconv(conv, &inchar, &incharsize, &outcharp, &outcharsize);
+	iconv(conv, &inch, &inchsize, &outchp, &outchsize);
 
 	c->cell[c->row][c->col].utfchar = calloc(1, MAX_UTFSTR);
 	if (!c->cell[c->row][c->col].utfchar) {
 		perror(NULL);
-		exit(EXIT_FAILURE);
+		exit(EX_OSERR);
 	}
 
-	strcpy(c->cell[c->row][c->col].utfchar, oldoutcharp);
+	strcpy(c->cell[c->row][c->col].utfchar, oldoutchp);
 
-	free(oldoutcharp);
+	free(oldoutchp);
 
 	c->cell[c->row][c->col].fg = fg;
 	c->cell[c->row][c->col].bg = bg;
