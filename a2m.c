@@ -473,10 +473,10 @@ print_color(canvas_t *c, cell_t *cell, int col)
 {
 	static cell_t *prev = NULL;
 
-	int oldfg = (!prev || col == 0 + c->lcrop) ? DEFAULT_FG : prev->fg;
-	int oldbg = (!prev || col == 0 + c->lcrop) ? DEFAULT_BG : prev->bg;
-	int oldbold = (!prev || col == 0 + c->lcrop) ? DEFAULT_BOLD : prev->bold;
-	int oldice = (!prev || col == 0 + c->lcrop) ? DEFAULT_ICE : prev->ice;
+	int oldfg = (!prev || col == c->lcrop) ? DEFAULT_FG : prev->fg;
+	int oldbg = (!prev || col == c->lcrop) ? DEFAULT_BG : prev->bg;
+	int oldbold = (!prev || col == c->lcrop) ? DEFAULT_BOLD : prev->bold;
+	int oldice = (!prev || col == c->lcrop) ? DEFAULT_ICE : prev->ice;
 
 	if (cell->fg != oldfg || cell->bg != oldbg || cell->bold != oldbold || cell->ice != oldice) {
 
