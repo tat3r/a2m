@@ -3,7 +3,7 @@ SRC := a2m.c
 CC := cc
 CFLAGS += -g -std=c99 -Wall
 
-UNAME := $(shell sh -c 'UNAME -s 2>/dev/null')
+UNAME := $(shell sh -c 'uname -s 2>/dev/null')
 
 ifeq ($(UNAME),Darwin)
 	CC := clang
