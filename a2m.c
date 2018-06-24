@@ -251,6 +251,10 @@ int main(int argc, char *argv[]) {
 							c->ice = false;
 						else if (param[i] >= 30 && param[i] <= 37)
 							c->fg = param[i] - 30;
+						else if (param[i] >= 90 && param[i] <= 97) {
+							c->fg = param[i] - 90;
+							c->bold = true;
+						}
 						else if (param[i] >= 40 && param[i] <= 47)
 							c->bg = param[i] - 40;
 						else if (param[i] == 39)
