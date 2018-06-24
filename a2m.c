@@ -482,8 +482,7 @@ print_color(canvas_t *c, cell_t *cell, int col)
 
 		printf("\x03");
 
-		if (cell->fg != oldfg || cell->bold != oldbold)
-			printf("%d", get_fgcolor(cell));
+		printf("%d", get_fgcolor(cell));
 
 		if (cell->bg != oldbg || (cell->ice != oldice))
 			printf(",%d", get_bgcolor(cell));
