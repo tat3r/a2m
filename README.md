@@ -9,17 +9,30 @@ machine attached to a tmux session running irssi.
 
 ## Installation
 
-run make and copy a2m wherever you want.
+```
+make
+sudo make install
+```
 
 ## Usage
 
-run a2m -h for a list of options
+```
+a2m [options] [input.ans]
+	-l n      Crop n lines from the left side.
+	-r n      Crop n lines from the right side.
+	-n        Disable color output.
+	-p        Print unprintable characters.
+	-t size   Specify tab size, default is 8.
+	-w width  Specify width, default is 80.
+```
 
 ## Troubleshooting
 
 ### IRC Client
 
-Most clients work fine assuming you're using a good font (see below.)  Mirc has problems with color sequences following 3 byte Unicode characters, IRCCloud has incorrect colors.
+Most clients work fine assuming you're using a good font (see below.)
+* Mirc has problems with color sequences following 3 byte Unicode characters.
+* IRCCloud has incorrect colors.
 
 ### Terminal
 
@@ -38,7 +51,7 @@ Magenta | #aa00aa (170, 0, 170)   | #ff55ff (255, 85, 255)
 Cyan    | #00aaaa (0, 170, 170 )  | #55ffff (85, 255, 255)
 White   | #aaaaaa (170, 170, 170) | #ffffff (255, 255, 255)
 
-### Font
+### Fonts
 
 Try *Andale Mono* or *Menlo* for Mac.  *Deja Vu Sans* for Linux,
 *Lucida Console* for Windows.
