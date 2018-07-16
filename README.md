@@ -2,7 +2,7 @@
 
 Convert ansi art to mirc art.
 
-![screenshot](https://github.com/tat3r/a2m/blob/master/screenshot.png?raw=true)
+![screenshot](https://git.trollforge.org/a2m/plain/screenshot.png)
 
 For reference screenshot is iTerm2 with Menlo font ssh'd to a linux
 machine attached to a tmux session running irssi.
